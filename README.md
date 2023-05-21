@@ -41,11 +41,17 @@ localhost:8000/hello 에서 hello 를 Get 방식으로 넘겨줄 때에
 데이터를 attributeValue 에 입력해 준다.
 return 값은 viewResolver 를 통해 templates/hello.html 를 찾아 넘겨줄 페이지이다.
 
-<img src="../../PIC/JAVA Spring/Get Mapping.png" width=70%>
+```JAVA
+@GetMapping("hello")
+    public String hello(Model model) {
+        model.addAttribute("data", "hello!!");
+        return "hello";
+    }
+```
 
 ### 빌드하기
 
-- 프로젝트 폴더에서 명령어 입력시 build 폴더가 생성되고 build/libs 내부에 .jar 파일이 생성된다.
+- 프로젝트 폴더에서 명령어 입력시 build 폴더가 생성되고 bui`ld/libs 내부에 .jar 파일이 생성된다.
 - java -jar 파일명.jar 를 통해 실행
 
 ```CMD
@@ -118,14 +124,16 @@ java -jar 파일명.jar
 
 #### API
 - 템플릿 엔진과 다르게 뷰를 거치지 않고 전송한 문자가 그대로 전송된다.
+- 원래는 뷰 리졸버에게 처리를 하라며 던져 줬지만 [@ResponseBody](#@ResponseBody)가 있다면 http 데이터를 그대로 넘겨준다.
 
 #### @ResponseBody
 - Http 의 Body 에 문자 내용을 직접 반환
+- 문자 데이터라면 http 형식으로 그냥 넘겨 준다.
+- 객체 반환 시 json 데이터로 반환 해준다.
 - viewResolver 대신 [HttpMessageConverter](#HttpMessageConverter) 가 동작
 
 #### HttpMessageConverter
-
-- 기존의 템플릿 방식에서는 요청이 들어오면 뷰 리졸버에게 던져 맞는 페이지를 넘겨 주었지만 [@ResponseBody](#@ResponseBody) 가 있는 경우에는 뷰 리졸버가 아닌 HttpMessageConverter 가 동작하게 된다.
+- 기존의 템플릿 방식에서는 요청이 들어오면 뷰 리졸버에게 던져 맞는 페이지를 넘겨 주었지만[@ResponseBody](#@ResponseBody) 가 있는 경우에는 뷰 리졸버가 아닌 HttpMessageConverter 가 동작하게 된다.
 - HttpMessageConverter
     - StirngHttpMessageConverter
         - 단순 문자인 경우 작동하여 문자열을 넘겨준다.
@@ -144,7 +152,7 @@ java -jar 파일명.jar
 @afterEach 를 통해 메서드가 끝날 때마다 클리어를 시켜준다.
 
 ### Optional<T> 사용을 통한 return 으로 null 방지
-데이터 베이스에서 데이터를 가져올 때에 null 을 리턴 받을 경우 뜬금 없는 곳에서 null error 가 
+데이터 베이스에서 데이터를 가져올 때에 null 을 리턴 받을 경우 뜬금 없는 곳에서 null error 가
 나타나게 되는 경우가 있다.
 
 이를 통해 생기는 오류를 미연에 방지하고자 Optional<T> 의 사용을 언어적 차원에서 적극 권장한다.
