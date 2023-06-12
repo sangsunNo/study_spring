@@ -1,19 +1,24 @@
 ## Index
 
-- [Gradle](#Gradle)
-- [Gradle 을 통해 설치한 라이브러리](#Gradle-을-통해-설치한-라이브러리)
-- [Get 방식처리](#Get-방식처리)
+- [Gradle](#gradle)
+- [Gradle 을 통해 설치한 라이브러리](#gradle-을-통해-설치한-라이브러리)
+- [Get 방식처리](#get-방식처리)
 - [빌드하기](#빌드하기)
 - [정적-컨텐츠](#정적-컨텐츠)
 - [동적-컨텐츠](#동적-컨텐츠)
-- [MVC와-템플릿-엔진](#MVC와-템플릿-엔진)
+- [MVC와-템플릿-엔진](#mvc와-템플릿-엔진)
 - [thymeleaf-템플릿-특징](#thymeleaf-템플릿-특징)
-- [@RequestParam](#@RequestParam)
-- [API](#API)
-- [@ResponseBody](#@ResponseBody)
-- [HttpMessageConverter](#HttpMessageConverter)
-- [@afterEach 테스트 순서 보장](#@afterEach-테스트-순서-보장)
-- [Optional<T> 사용을 통한 return 으로 null 방지](#optional-사용을-통한-return-으로-null-방지
+- [@RequestParam](#requestparam)
+- [API](#api)
+- [@ResponseBody](#responsebody)
+- [HttpMessageConverter](#httpmessageconverter)
+- [@afterEach 테스트 순서 보장](#aftereach-테스트-순서-보장)
+- [Optional<T> 사용을 통한 return 으로 null 방지](#optional-사용을-통한-return-으로-null-방지)
+- [컴포넌트 스캔과 자동 의존관계 설정](#컴포넌트-스캔과-자동-의존관계-설정)
+- [자바 코드로 직접 스프링 빈 등록하기](#자바-코드로-직접-스프링-빈-등록하기)
+- [@Transactional](#transactional)
+
+---
 #### Gradle
 
 - Spring 에서 Gradle 은 자동으로 빌드를 도와주는 오픈소스 빌드 도구
@@ -158,3 +163,65 @@ java -jar 파일명.jar
 이를 통해 생기는 오류를 미연에 방지하고자 Optional<T> 의 사용을 언어적 차원에서 적극 권장한다.
 
 Optional 으로 감싸줌으로 써 불필요한 자원의 낭비라고 생각될 수 있지만 이로 인해 사용되는 자원이 크지 않기에 걱정하지 않아도 된다.
+
+### 테스트 구조
+- given: 무언가 주어졌을 때
+- when: 이걸 실행 했을 때
+- then: 결과가 이렇게 나와야 할 떄
+
+given 의 데이터와 when 함수를 통해 나온 값을 then 에서 검증
+
+### Spring 의존관계 주입
+
+#### 컴포넌트 스캔과 자동 의존관계 설정
+- 의존관계 주입 == Dependency Injection == DI
+- 처음 서버를 시작 할 때에 컴포넌트 스캔을 자동 의존관계 설정
+
+여러 컨트롤러들이 공통적으로 사용하는 model 의 클래스 또는 함수를 모두 인스턴스화 해서 사용하게 된다면 class 에서 static 으로 사용되는 것이 아닌 경우에 오류가 생길 확률이 높아지게 된다.
+이러한 오류를 방지하기 위해 객체간의 의존성을 주입하는게 필요하다.
+
+Spring 에서는 어노테이션을 통해 각자의 역할을 정하여 Spring 에서 의존성을 주입해주고 이렇게 생성된 것을 가져다 사용한다.
+
+
+- @Componet 어노테이션을 사용시 Spring 빈에 자동으로 등록이 된다.
+
+기본적으로 모두 @Component 를 포함하고 있다.
+
+>@Component
+>>@Controller
+>>@Service
+>>@Repository
+
+- @Autowired 를 통해서 의존관계가 주입된 기능들을 가져다 사용한다.
+
+```JAVA
+// MemberController 는 당연히 @Controller 어노테이션을 통해 Spring 빈에 등록이 되어있다.
+
+@Autowired
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
+    }
+```
+
+#### 자바 코드로 직접 스프링 빈 등록하기
+- 코드를 통해 직접 의존 관계를 입력
+- service 폴더에 SpringConfig 클래스를 생성
+- 컴포넌트 스캔을 통한 수정시 여러 파일을 바꿔야 하지만 직접 파일을 통한 운영시 파일 한 개만 수정하여 주면 된다.
+
+```JAVA
+@Configuration
+public class SpringConfig {
+    @Bean
+    public MemberService memberService() {
+        return new MemberService(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+}
+```
+
+### @Transactional
+Spring 에서 테스트 코드를 돌릴 경우 데이터 베이스에 테스트 코드가 계속 쌓이게 되는데 이때에 join 쿼리를 보낸 후 commit 을 하기 전에 롤백을 통해 데이터 베이스에 데이터가 반영이 되지 않게 한다.
