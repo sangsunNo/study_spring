@@ -51,10 +51,10 @@ return 값은 viewResolver 를 통해 templates/hello.html 를 찾아 넘겨줄 
 
 ```JAVA
 @GetMapping("hello")
-    public String hello(Model model) {
+public String hello(Model model) {
         model.addAttribute("data", "hello!!");
         return "hello";
-    }
+        }
 ```
 
 ### 빌드하기
@@ -102,10 +102,10 @@ java -jar 파일명.jar
 
 ```JAVA
 @GetMapping("hello-mvc")
-    public String helloMvc(@RequestParam(value = "name", required = false) String name, Model model) {
+public String helloMvc(@RequestParam(value = "name", required = false) String name, Model model) {
         model.addAttribute("name", name);
         return "hello-template";
-    }
+        }
 ```
 
 - name 위치에 name 이라는 파라미터에 넘겨준 값이 들어온다.
@@ -243,3 +243,8 @@ Spring 에서 테스트 코드를 돌릴 경우 데이터 베이스에 테스트
 - 서비스 마다 다른 고유 검색 값인 name, username, id, userid 와 같은 경우
     - findByName, findByUsername, findByIdAndUserid 와 같이 메서드 이름만으로 조회를 할 수 있는 기능 제공.
 - 복잡한 동적 쿼리는 Querydsl 이라는 라이브러리 사용
+
+### AOP
+- 데이터 조회 시간 측정기능과 같은 핵심 관심 사항이 아닌 공통 관심 사항 기능들을 각 메서드마다 넣게 되면 로직이 섞이고 유지보수가 까다로워 진다.
+- 공통 관심사항과 핵심 관심 사항을 분리하여 필요한 곳에만 공통 관심 사항을 적용시켜 동작하게 한다.
+- 병경이 필요하다면 한 번의 로직 변경을 통해 모두 적용이 가능하다.
